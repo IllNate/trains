@@ -32,6 +32,9 @@ function wood_well_rim()         = (wood_width() - wood_well_spacing() - 2 * woo
 function wood_plug_radius()      = 6;
 function wood_plug_neck_length() = 12;
 
+// Constants for Ikea wooden tracks
+function ikea_plug_neck_length() = 10.5;
+
 // Constants for trackmaster parts
 function trackmaster_width()            = 40;
 function trackmaster_height()           = 12;
@@ -401,6 +404,42 @@ module wood_plug(height = wood_height()) {
  */
 module wood_cutout() {
     plug_cutout(wood_plug_radius() + .3, wood_plug_neck_length(), wood_height());
+}
+
+/* ******************************************************************************
+ * Modules dealing with Ikea compatible track/parts
+ * ****************************************************************************** 
+
+/**
+ * Plug (male) for wooden track, centered on its y axis.
+ * @param float height      Height of the plug to render.  This should be left at the default but can be overridden in special cases.
+ */
+module ikea_plug(height = wood_height()) {
+    post_w = 6;
+    pad = 1; // padding to account for track bevels
+    // Render the part
+    union() {
+        translate(v=[-pad-$o,-post_w/2,0])
+            hull() {
+                translate([0,0,1])
+                    cube(size=[$o+ikea_plug_neck_length()+pad,post_w,height-2]);
+                translate([0,1,0])
+                    cube(size=[$o+ikea_plug_neck_length()+pad,post_w-2,height]);
+        }
+        translate(v=[ikea_plug_neck_length(),0,0])
+            hull() {
+                translate([0,0,1])
+                    cylinder(h=height-2,r=wood_plug_radius());
+                cylinder(h=height,r=wood_plug_radius()-bevel_width);
+        }
+    }
+}
+
+/**
+ * Cutout (female) for wooden track, centered on its Y axis
+ */
+module ikea_cutout() {
+    plug_cutout(wood_plug_radius() + .3, ikea_plug_neck_length(), wood_height());
 }
 
 /* ******************************************************************************
